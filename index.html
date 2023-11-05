@@ -7,43 +7,87 @@
     <title>Document</title>
   </head>
   <body>
-    OK
+    <div id="map" style="height: 400px; width: 100%"></div>
 
     <div id="details"></div>
-
+    <br />
     <button onclick="buttonClickHandler()">Stop watching location</button>
 
     <script>
       var reqcount = 0;
+      var map;
+      var position;
+      var marker;
 
-      const successCallback = (position) => {
-        const { accuracy, latitude, longitude, altitude, heading, speed } =
-          position.coords;
+      function initMap() {
+        map = new google.maps.Map(document.getElementById("map"), {
+          center: { lat: -34.397, lng: 150.644 },
+          zoom: 17,
+        });
 
-        console.log(accuracy, latitude, longitude, altitude, heading, speed);
+        marker = new google.maps.Circle({
+          strokeColor: "#0000FF",
+          strokeOpacity: 0.8,
+          strokeWeight: 2,
+          fillColor: "#0000FF",
+          fillOpacity: 0.4,
+          radius: 7,
+          map: map,
+        });
 
-        reqcount++;
+        const successCallback = (pos) => {
+          const { accuracy, latitude, longitude, altitude, heading, speed } =
+            pos.coords;
 
-        details.innerHTML = "Accuracy: " + accuracy + "<br>";
-        details.innerHTML +=
-          "Latitude: " + latitude + " | " + "Longitude: " + longitude + "<br>";
-        details.innerHTML += "Altitude: " + altitude + "<br>";
-        details.innerHTML += "Heading: " + heading + "<br>";
-        details.innerHTML += "Speed: " + speed + "<br>";
-        details.innerHTML += "Reqcount: " + reqcount;
-      };
+          reqcount++;
 
-      const errorCallback = () => {};
+          position = {
+            lat: latitude,
+            lng: longitude,
+          };
 
-      const options = {
-        enableHighAccuracy: true,
-      };
+          map.setCenter(position);
+          marker.setCenter(position);
+          if (heading) marker.setHeading(heading);
 
-      navigator.geolocation.watchPosition(
-        successCallback,
-        errorCallback,
-        options
-      );
+          details.innerHTML = "Accuracy: " + accuracy + "<br>";
+          details.innerHTML +=
+            "Latitude: " +
+            latitude +
+            " | " +
+            "Longitude: " +
+            longitude +
+            "<br>";
+          details.innerHTML += "Altitude: " + altitude + "<br>";
+          details.innerHTML += "Heading: " + heading + "<br>";
+          details.innerHTML += "Speed: " + speed + "<br>";
+          details.innerHTML += "Reqcount: " + reqcount;
+        };
+
+        const errorCallback = () => {};
+
+        const options = {
+          // enableHighAccuracy: false,
+        };
+
+        const watchId = navigator.geolocation.watchPosition(
+          successCallback,
+          errorCallback,
+          options
+        );
+
+        function buttonClickHandler() {
+          navigator.geolocation.clearWatch(watchId);
+          details.innerHTML = "";
+        }
+      }
+
+      window.initMap = initMap;
     </script>
+
+    <script
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDBH4_DTpvk4OlZ3JY85p6fB9wwJ8YKRU0&callback=initMap&v=weekly"
+      defer
+    ></script>
   </body>
 </html>
