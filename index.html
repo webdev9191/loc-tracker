@@ -11,13 +11,15 @@
 
     <div id="details"></div>
     <br />
-    <button onclick="buttonClickHandler()">Stop watching location</button>
+
+    <!-- <button onclick="buttonClickHandler()">Stop watching location</button> -->
 
     <script>
       var reqcount = 0;
       var map;
       var position;
       var marker;
+      // var watchId;
 
       function initMap() {
         map = new google.maps.Map(document.getElementById("map"), {
@@ -67,21 +69,20 @@
         const errorCallback = () => {};
 
         const options = {
-          // enableHighAccuracy: false,
+          enableHighAccuracy: true,
         };
 
-        const watchId = navigator.geolocation.watchPosition(
+        navigator.geolocation.watchPosition(
           successCallback,
           errorCallback,
           options
         );
-
-        function buttonClickHandler() {
-          navigator.geolocation.clearWatch(watchId);
-          details.innerHTML = "";
-        }
       }
 
+      // function buttonClickHandler() {
+      //   navigator.geolocation.clearWatch(watchId);
+      //   details.innerHTML = "";
+      // }
       window.initMap = initMap;
     </script>
 
