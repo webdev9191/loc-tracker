@@ -9,10 +9,10 @@
   <body>
     <div id="map" style="height: 400px; width: 100%"></div>
 
-    <br>
+    <br />
     <div id="details"></div>
     <br />
-    <div id="totalDistance"></div>
+    <div id="totalDistance">Total Distance Traveled:</div>
 
     <!-- <button onclick="buttonClickHandler()">Stop watching location</button> -->
 
@@ -64,11 +64,7 @@
               longitude
             );
             totalDistance += distance;
-            totalDistanceDiv.innerHTML =
-              "<br>" +
-              "Total Distance Traveled: " +
-              totalDistance.toFixed(2) +
-              " km<br>";
+            totalDistanceDiv.innerHTML = totalDistance.toFixed(2) + " km";
           }
 
           prevPosition = {
@@ -91,7 +87,7 @@
           details.innerHTML += "Altitude: " + altitude + "<br>";
           details.innerHTML += "Heading: " + heading + "<br>";
           details.innerHTML += "Speed: " + speed + "<br>";
-          details.innerHTML += "Reqcount: " + reqcount;
+          // details.innerHTML += "Reqcount: " + reqcount;
         };
 
         function calculateDistance(lat1, lon1, lat2, lon2) {
