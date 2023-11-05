@@ -9,8 +9,10 @@
   <body>
     <div id="map" style="height: 400px; width: 100%"></div>
 
+    <br>
     <div id="details"></div>
     <br />
+    <div id="totalDistance"></div>
 
     <!-- <button onclick="buttonClickHandler()">Stop watching location</button> -->
 
@@ -20,6 +22,9 @@
       var position;
       var marker;
       // var watchId;
+
+      var prevPosition = null;
+      var totalDistance = 0;
 
       function initMap() {
         map = new google.maps.Map(document.getElementById("map"), {
@@ -48,6 +53,29 @@
             lng: longitude,
           };
 
+          if (prevPosition) {
+            const totalDistanceDiv = document.getElementById("totalDistance");
+
+            // Calculate distance between previous and current positions using Haversine formula
+            const distance = calculateDistance(
+              prevPosition.lat,
+              prevPosition.lng,
+              latitude,
+              longitude
+            );
+            totalDistance += distance;
+            totalDistanceDiv.innerHTML =
+              "<br>" +
+              "Total Distance Traveled: " +
+              totalDistance.toFixed(2) +
+              " km<br>";
+          }
+
+          prevPosition = {
+            lat: latitude,
+            lng: longitude,
+          };
+
           map.setCenter(position);
           marker.setCenter(position);
           if (heading) marker.setHeading(heading);
@@ -66,10 +94,31 @@
           details.innerHTML += "Reqcount: " + reqcount;
         };
 
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+          const R = 6371; // Radius of the earth in km
+          const dLat = deg2rad(lat2 - lat1); // deg2rad below
+          const dLon = deg2rad(lon2 - lon1);
+          const a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(deg2rad(lat1)) *
+              Math.cos(deg2rad(lat2)) *
+              Math.sin(dLon / 2) *
+              Math.sin(dLon / 2);
+          const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+          const distance = R * c; // Distance in km
+          return distance;
+        }
+
+        function deg2rad(deg) {
+          return deg * (Math.PI / 180);
+        }
+
         const errorCallback = () => {};
 
         const options = {
           enableHighAccuracy: true,
+          maximumAge: 30000,
+          timeout: 5000,
         };
 
         navigator.geolocation.watchPosition(
