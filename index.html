@@ -17,6 +17,8 @@
     <div id="details"></div>
     <br />
     <div id="totalDistance">Total Distance Traveled:</div>
+    <br />
+    <div id="prevPos">Prev Pos placeholder</div>
 
     <script>
       var reqcount = 0;
@@ -64,8 +66,6 @@
               latitude,
               longitude
             );
-
-            console.log(distance);
 
             totalDistance += distance;
             totalDistanceDiv.innerHTML =
