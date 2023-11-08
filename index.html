@@ -17,8 +17,6 @@
     <div id="details"></div>
     <br />
     <div id="totalDistance">Total Distance Traveled:</div>
-    <br />
-    <div id="prevPos">Prev Pos placeholder</div>
 
     <script>
       var reqcount = 0;
@@ -46,93 +44,99 @@
         });
 
         const successCallback = (pos) => {
-          const { accuracy, latitude, longitude, altitude, heading, speed } =
-            pos.coords;
-
-            console.log("pos: ", pos)
-            console.log("pos.coords: ", pos.coords)
-
+          const { accuracy, latitude, longitude, speed } = pos.coords;
 
           reqcount++;
 
-          position = {
-            lat: latitude,
-            lng: longitude,
-          };
+          // წინაპირობა გამოთვლების დასაწყებად: მინიმუმ ამდენი მ/წ უნდა იყოს სიჩქარე
+          const walking_speed = 0.2;
 
-          if (prevPosition) {
-            const totalDistanceDiv = document.getElementById("totalDistance");
+          if (speed > walking_speed) {
+            position = {
+              lat: latitude,
+              lng: longitude,
+            };
 
-            // Calculate distance between previous and current positions using Haversine formula
-            const distance = calculateDistance(
-              prevPosition.lat,
-              prevPosition.lng,
-              latitude,
-              longitude
-            );
+            if (prevPosition) {
+              const totalDistanceDiv = document.getElementById("totalDistance");
 
-            totalDistance += distance;
-            totalDistanceDiv.innerHTML =
-              "Total Distance Traveled: " + totalDistance.toFixed(2) + " km";
+              // Calculate distance between previous and current positions using Haversine formula
+              const distance = calculateDistance(
+                prevPosition.lat,
+                prevPosition.lng,
+                latitude,
+                longitude
+              );
+
+              totalDistance += distance;
+              totalDistanceDiv.innerHTML =
+                "Total Distance Traveled: " + totalDistance.toFixed(2) + " km";
+            }
+
+            prevPosition = {
+              lat: latitude,
+              lng: longitude,
+            };
+
+            map.setCenter(position);
+            marker.setCenter(position);
+
+            // ყველაფერი რო მორჩება საიტზე რო გამოსახოს მაგის კოდია ეს
+            details.innerHTML = "Accuracy: " + accuracy + "<br>";
+            details.innerHTML +=
+              "Latitude: " +
+              latitude +
+              " | " +
+              "Longitude: " +
+              longitude +
+              "<br>";
+            details.innerHTML += "Altitude: " + altitude + "<br>";
+            details.innerHTML += "Heading: " + heading + "<br>";
+            details.innerHTML += "Speed: " + speed + "<br>";
+          } else {
+            details.innerHTML = "სიჩქარე ზედმეტად დაბალია (less than 0.2m/s)";
           }
-
-          prevPosition = {
-            lat: latitude,
-            lng: longitude,
-          };
-
-          map.setCenter(position);
-          marker.setCenter(position);
-          if (heading) marker.setHeading(heading);
-
-          details.innerHTML = "Accuracy: " + accuracy + "<br>";
-          details.innerHTML +=
-            "Latitude: " +
-            latitude +
-            " | " +
-            "Longitude: " +
-            longitude +
-            "<br>";
-          details.innerHTML += "Altitude: " + altitude + "<br>";
-          details.innerHTML += "Heading: " + heading + "<br>";
-          details.innerHTML += "Speed: " + speed + "<br>";
         };
 
-        function calculateDistance(lat1, lon1, lat2, lon2) {
-          const R = 6371; // Radius of the earth in km
-          const dLat = deg2rad(lat2 - lat1); // deg2rad below
-          const dLon = deg2rad(lon2 - lon1);
-          const a =
-            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-            Math.cos(deg2rad(lat1)) *
-              Math.cos(deg2rad(lat2)) *
-              Math.sin(dLon / 2) *
-              Math.sin(dLon / 2);
-          const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-          const distance = R * c; // Distance in km
-          return distance;
-        }
-
-        function deg2rad(deg) {
-          return deg * (Math.PI / 180);
-        }
-
+        // არ შვება ჯერ არაფერს
         const errorCallback = () => {};
 
+        // მაღალი სიზუსტის პარამეტრები დოკუმენტაციის მიხედვით
         const options = {
           enableHighAccuracy: true,
-          maximumAge: 30000,
-          timeout: 5000,
+          // maximumAge: 30000,
+          // timeout: 5000,
         };
 
         navigator.geolocation.watchPosition(
-          successCallback,
-          errorCallback,
-          options
+          // ეს ფუნქცია იწყებს თრექინგს
+          successCallback, // ლოკაციის წარმატებით მოძიების შემთხვევაში ამ ფუნქიას გაუშვებს
+          errorCallback, // წარუმატებლობაზე ამ ფუნქციას
+          options // ეს პარამეტრებია
         );
       }
 
       window.initMap = initMap;
+
+      // FORMULAS
+      function calculateDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371; // Radius of the earth in km
+        const dLat = deg2rad(lat2 - lat1); // deg2rad below
+        const dLon = deg2rad(lon2 - lon1);
+        const a =
+          Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+          Math.cos(deg2rad(lat1)) *
+            Math.cos(deg2rad(lat2)) *
+            Math.sin(dLon / 2) *
+            Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        const distance = R * c; // Distance in km
+        return distance;
+      }
+
+      function deg2rad(deg) {
+        return deg * (Math.PI / 180);
+      }
     </script>
   </body>
 </html>
