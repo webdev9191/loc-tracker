@@ -103,18 +103,16 @@
               circularBuffer.addItem([position, prevPosition]);
               console.log("Current buffer: ", circularBuffer.getBuffer());
 
-              if (reqCount % 5 == 0) {
-                // თუ 5ზე გაყოფისას ნაშთი ნულია
-
+              if (reqCount % 5 == 0) { // თუ 5ზე გაყოფისას ნაშთი ნულია
                 const coordinates = circularBuffer.getBuffer();
 
                 // Calculate the average for "position"
-                const positionLatAverage = calculateAverage("position", "lat");
-                const positionLngAverage = calculateAverage("position", "lng");
+                const positionLatAverage = calculateAverage(coordinates, "position", "lat");
+                const positionLngAverage = calculateAverage(coordinates, "position", "lng");
 
                 // Calculate the average for "prevPosition"
-                const prevPositionLatAverage = calculateAverage("prevPosition", "lat");
-                const prevPositionLngAverage = calculateAverage("prevPosition", "lng");
+                const prevPositionLatAverage = calculateAverage(coordinates, "prevPosition", "lat");
+                const prevPositionLngAverage = calculateAverage(coordinates, "prevPosition", "lng");
 
                 console.log('Average "position" latitude:', positionLatAverage);
                 console.log('Average "position" longitude:', positionLngAverage);
@@ -175,7 +173,7 @@
         return deg * (Math.PI / 180);
       }
 
-      const calculateAverage = (positionType, coordinateType) => {
+      const calculateAverage = (coordinates, positionType, coordinateType) => {
         const positions = coordinates.map((item) => item.find((p) => p.name === positionType));
         const validPositions = positions.filter((position) => position !== undefined && position[coordinateType] !== undefined);
 
