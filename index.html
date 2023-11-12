@@ -15,6 +15,7 @@
     <div id="map" style="height: 400px; width: 100%"></div>
     <br />
     <div id="details"></div>
+    <div id="speed"></div>
     <br />
     <div id="totalDistance">Total Distance Traveled:</div>
 
@@ -26,6 +27,9 @@
 
       var prevPosition = null;
       var totalDistance = 0;
+
+      // წინა გრძედ განედების დასაქეშად
+      //   var latLongsArray = [];
 
       function initMap() {
         map = new google.maps.Map(document.getElementById("map"), {
@@ -46,6 +50,15 @@
         const successCallback = (pos) => {
           const { accuracy, latitude, longitude, speed } = pos.coords;
 
+          const speedDiv = document.getElementById("speed");
+          speedDiv.innerHTML = "Speed: " + speed + " [m/s]";
+
+          const accuracyDiv = document.getElementById("accuracy");
+          speedDiv.innerHTML =
+            "Accuracy: " +
+            accuracy +
+            ` [meter] (${accuracy.toFixed(1)} მეტრ რადიუსით ზუსტი)`;
+
           reqcount++;
 
           // წინაპირობა გამოთვლების დასაწყებად: მინიმუმ ამდენი მ/წ უნდა იყოს სიჩქარე
@@ -60,19 +73,34 @@
             if (prevPosition) {
               const totalDistanceDiv = document.getElementById("totalDistance");
 
-              // Calculate distance between previous and current positions using Haversine formula
-              const distance = calculateDistance(
-                prevPosition.lat,
-                prevPosition.lng,
-                latitude,
-                longitude
-              );
+              //   latLongsArray.push([position, prevPosition]);
+              //   console.log(latLongsArray);
 
-              totalDistance += distance;
-              totalDistanceDiv.innerHTML =
-                "Total Distance Traveled: " + totalDistance.toFixed(2) + " km";
+              class CircularBuffer {
+                constructor(size) {
+                  this.buffer = new Array(size).fill(null);
+                  this.size = size;
+                  this.head = 0; // points to the next position to be replaced
+                }
+
+                addItem(item) {
+                  this.buffer[this.head] = item;
+                  this.head = (this.head + 1) % this.size;
+                }
+
+                getBuffer() {
+                  return this.buffer;
+                }
+              }
+
+              const bufferSize = 5;
+              const circularBuffer = new CircularBuffer(bufferSize);
+
+              circularBuffer.addItem([position, prevPosition]);
+              console.log("Current buffer:", circularBuffer.getBuffer());
             }
 
+            // თუ არარი prevPosition მაშინ აწი იქნება და შემდეგ successCallbackზე გამოთვლის მანძილს
             prevPosition = {
               lat: latitude,
               lng: longitude,
@@ -80,6 +108,7 @@
 
             map.setCenter(position);
             marker.setCenter(position);
+            marker.setRadius(accuracy);
 
             // ყველაფერი რო მორჩება საიტზე რო გამოსახოს მაგის კოდია ეს
             details.innerHTML = "Accuracy: " + accuracy + "<br>";
