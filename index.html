@@ -10,6 +10,9 @@
   <body>
     <div id="map" style="height: 400px; width: 100%"></div>
     <br />
+    <div id="bufferSize"></div>
+    <br />
+    <br />
     <div id="accuracy"></div>
     <br />
     <div id="speed"></div>
@@ -48,7 +51,11 @@
         }
       }
 
-      const bufferSize = 5;
+      const bufferSize = Number(window.prompt("Circular buffer size | რამდენი რექუესთის შემდეგ გამოთვალოს დისტანცია (default:5)", "")) || 5;
+
+      const bufferDiv = document.getElementById("bufferSize")
+      bufferDiv.innerHTML = `Circular buffer size: ${bufferSize} | რამდენი რექუესთის შემდეგ გამოთვალოს დისტანცია`
+
       const circularBuffer = new CircularBuffer(bufferSize);
 
       function initMap() {
@@ -103,14 +110,14 @@
               circularBuffer.addItem([position, prevPosition]);
               console.log("Current buffer: ", circularBuffer.getBuffer());
 
-              if (reqCount % 5 == 0) { // თუ 5ზე გაყოფისას ნაშთი ნულია
+              if (reqCount == bufferSize) {
+                reqCount = 0; // reset
+
                 const coordinates = circularBuffer.getBuffer();
 
-                // Calculate the average for "position"
                 const positionLatAverage = calculateAverage(coordinates, "position", "lat");
                 const positionLngAverage = calculateAverage(coordinates, "position", "lng");
 
-                // Calculate the average for "prevPosition"
                 const prevPositionLatAverage = calculateAverage(coordinates, "prevPosition", "lat");
                 const prevPositionLngAverage = calculateAverage(coordinates, "prevPosition", "lng");
 
@@ -120,12 +127,10 @@
                 console.log('Average "prevPosition" latitude:', prevPositionLatAverage);
                 console.log('Average "prevPosition" longitude:', prevPositionLngAverage);
 
-                const travelledDistance = calculateDistance(prevPositionLatAverage, prevPositionLngAverage, positionLatAverage, positionLngAverage);
+                totalDistance += calculateDistance(prevPositionLatAverage, prevPositionLngAverage, positionLatAverage, positionLngAverage);
 
                 const totalDistanceDiv = document.getElementById("totalDistance");
-                totalDistanceDiv.innerHTML = `გავლილი მანძილი: ${travelledDistance}`;
-
-                reqCount = 0; // reset
+                totalDistanceDiv.innerHTML = `გავლილი მანძილი: ${totalDistance.toFixed(8)} km`;
               }
             }
 
