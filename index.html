@@ -105,7 +105,6 @@
 
               if (reqCount % 5 == 0) {
                 // თუ 5ზე გაყოფისას ნაშთი ნულია
-                reqCount = 0; // reset
 
                 const coordinates = circularBuffer.getBuffer();
 
@@ -127,6 +126,8 @@
 
                 const totalDistanceDiv = document.getElementById("totalDistance");
                 totalDistanceDiv.innerHTML = `გავლილი მანძილი: ${travelledDistance}`;
+
+                reqCount = 0; // reset
               }
             }
 
