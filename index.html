@@ -14,10 +14,17 @@
   <body>
     <div id="map" style="height: 400px; width: 100%"></div>
     <br />
-    <div id="details"></div>
     <div id="speed"></div>
     <br />
-    <div id="totalDistance">Total Distance Traveled:</div>
+    <div id="accuracy"></div>
+    <br />
+    <br />
+    <div id="details"></div>
+    <br />
+    <br />
+    <div id="circular-buffer"></div>
+    <br> <br>
+    <div id="totalDistance"></div>
 
     <script>
       var reqcount = 0;
@@ -48,18 +55,16 @@
         });
 
         const successCallback = (pos) => {
+          reqcount++;
+
           const { accuracy, latitude, longitude, speed } = pos.coords;
 
           const speedDiv = document.getElementById("speed");
-          speedDiv.innerHTML = "Speed: " + speed + " [m/s]";
+          speedDiv.innerHTML = "Speed: " + speed.toFixed(10) + " [m/s]";
 
           const accuracyDiv = document.getElementById("accuracy");
-          speedDiv.innerHTML =
-            "Accuracy: " +
-            accuracy +
-            ` [meter] (${accuracy.toFixed(1)} მეტრ რადიუსით ზუსტი)`;
-
-          reqcount++;
+          accuracyDiv.innerHTML =
+            "Accuracy: " + accuracy.toFixed(2) + ` მეტრ რადიუსით ზუსტი)`;
 
           // წინაპირობა გამოთვლების დასაწყებად: მინიმუმ ამდენი მ/წ უნდა იყოს სიჩქარე
           const walking_speed = 0.2;
@@ -98,6 +103,9 @@
 
               circularBuffer.addItem([position, prevPosition]);
               console.log("Current buffer:", circularBuffer.getBuffer());
+
+              const circularBufferDiv = document.getElementById("circular-buffer")
+              circularBufferDiv.innerHTML = circularBuffer.getBuffer().toString()
             }
 
             // თუ არარი prevPosition მაშინ აწი იქნება და შემდეგ successCallbackზე გამოთვლის მანძილს
@@ -111,7 +119,8 @@
             marker.setRadius(accuracy);
 
             // ყველაფერი რო მორჩება საიტზე რო გამოსახოს მაგის კოდია ეს
-            details.innerHTML = "Accuracy: " + accuracy + "<br>";
+            details.innerHTML =
+              `სიჩქარე მეტია ${walking_speed}-ზე, გამოთვლა დაიწყო` + "<br>";
             details.innerHTML +=
               "Latitude: " +
               latitude +
@@ -119,11 +128,8 @@
               "Longitude: " +
               longitude +
               "<br>";
-            details.innerHTML += "Altitude: " + altitude + "<br>";
-            details.innerHTML += "Heading: " + heading + "<br>";
-            details.innerHTML += "Speed: " + speed + "<br>";
           } else {
-            details.innerHTML = "სიჩქარე ზედმეტად დაბალია (less than 0.2m/s)";
+            details.innerHTML = `სიჩქარე ნაკლებია ${walking_speed}-ზე`
           }
         };
 
