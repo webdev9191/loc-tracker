@@ -8,7 +8,9 @@
     <title>Document</title>
 
     <style>
-      .red { color: rgb(179, 0, 0); }
+      .red {
+        color: rgb(179, 0, 0);
+      }
     </style>
   </head>
   <body>
@@ -27,7 +29,7 @@
     <div id="details"></div>
     <br />
     <br />
-    <div id="totalDistance"></div>
+    <div id="totalDistance">გავლილი მანძილი: 0</div>
 
     <script>
       var reqCount = 0;
@@ -57,8 +59,8 @@
 
       const bufferSize = Number(window.prompt("Circular buffer size | რამდენი რექუესთის შემდეგ გამოთვალოს დისტანცია (default:5)", "")) || 5;
 
-      const bufferDiv = document.getElementById("bufferSize")
-      bufferDiv.innerHTML = `Circular buffer size: ${bufferSize} | რამდენი რექუესთის შემდეგ გამოთვალოს დისტანცია`
+      const bufferDiv = document.getElementById("bufferSize");
+      bufferDiv.innerHTML = `Circular buffer size: ${bufferSize} | რამდენი რექუესთის შემდეგ გამოთვალოს დისტანცია`;
 
       const circularBuffer = new CircularBuffer(bufferSize);
 
@@ -86,7 +88,6 @@
 
           const speedDiv = document.getElementById("speed");
           speedDiv.innerHTML = "Speed: " + speed.toFixed(8) + " [m/s]";
-          speedDiv.classList.add("red")
 
           // წინაპირობა გამოთვლების დასაწყებად: მინიმუმ ამდენი მ/წ უნდა იყოს სიჩქარე
           const walking_speed = 0.2;
@@ -96,6 +97,9 @@
           marker.setRadius(accuracy);
 
           if (speed > walking_speed) {
+            // styling
+            speedDiv.classList.add("red");
+
             reqCount++;
 
             const reqDiv = document.getElementById("reqcount");
@@ -135,7 +139,7 @@
                 totalDistance += calculateDistance(prevPositionLatAverage, prevPositionLngAverage, positionLatAverage, positionLngAverage);
 
                 const totalDistanceDiv = document.getElementById("totalDistance");
-                totalDistanceDiv.innerHTML = `გავლილი მანძილი: ${totalDistance.toFixed(8)} km`;
+                totalDistanceDiv.innerHTML = `${totalDistance.toFixed(8)} km`;
               }
             }
 
@@ -147,6 +151,8 @@
             };
           } else {
             details.innerHTML = `სიჩქარე ნაკლებია ${walking_speed}-ზე`;
+            // styling
+            speedDiv.classList.remove("red");
           }
         };
 
