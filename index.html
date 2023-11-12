@@ -51,6 +51,9 @@
         const successCallback = (pos) => {
           reqCount++;
 
+          const reqDiv = document.getElementById("reqcount")
+          reqcount.innerHTML = "reqCount: " + reqCount;
+
           const { accuracy, latitude, longitude, speed } = pos.coords;
 
           const accuracyDiv = document.getElementById("accuracy");
@@ -69,7 +72,6 @@
           if (speed > walking_speed) {
             details.innerHTML = `სიჩქარე მეტია ${walking_speed}-ზე, გამოთვლა დაიწყო` + "<br>";
             details.innerHTML += "Latitude: " + latitude + " | " + "Longitude: " + longitude + "<br>";
-            details.innerHtml += "Reqcount: " + reqCount;
 
             position = {
               name: "position",
